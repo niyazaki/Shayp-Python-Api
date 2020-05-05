@@ -14,84 +14,80 @@ db = SQLAlchemy(app)
 # Init ma
 ma = Marshmallow(app)
 
-# Product Class/Model
-class Product(db.Model):
+# User Class/Model
+class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(100), unique=True)
-  description = db.Column(db.String(200))
-  price = db.Column(db.Float)
-  qty = db.Column(db.Integer)
+  name = db.Column(db.String(100))
+  # birthdate = db.Column(db.Date())
+  adress = db.Column(db.String(150))
 
-  def __init__(self, name, description, price, qty):
+  def __init__(self, name, adress):
     self.name = name
-    self.description = description
-    self.price = price
-    self.qty = qty
+    # self.birthdate = birthdate
+    self.adress = adress
 
-# Product Schema
-class ProductSchema(ma.Schema):
+# User Schema
+class UserSchema(ma.Schema):
   class Meta:
-    fields = ('id', 'name', 'description', 'price', 'qty')
+    fields = ('id', 'name', 'adress')
 
 # Init schema
-product_schema = ProductSchema(strict=True)
-products_schema = ProductSchema(many=True, strict=True)
+user_schema = UserSchema(strict=True)
+users_schema = UserSchema(many=True, strict=True)
 
-# Create a Product
-@app.route('/product', methods=['POST'])
-def add_product():
+# Create a User
+@app.route('/user', methods=['POST'])
+def add_user():
   name = request.json['name']
-  description = request.json['description']
-  price = request.json['price']
-  qty = request.json['qty']
+  adress = request.json['adress']
+  # birthdate = request.json['birthdate']
 
-  new_product = Product(name, description, price, qty)
 
-  db.session.add(new_product)
+  new_user = User(name, adress)
+
+  db.session.add(new_user)
   db.session.commit()
 
-  return product_schema.jsonify(new_product)
+  return user_schema.jsonify(new_user)
 
-# Get All Products
-@app.route('/product', methods=['GET'])
-def get_products():
-  all_products = Product.query.all()
-  result = products_schema.dump(all_products)
+# Get All Users
+@app.route('/user', methods=['GET'])
+def get_users():
+  all_users = User.query.all()
+  result = users_schema.dump(all_users)
   return jsonify(result.data)
 
-# Get Single Products
-@app.route('/product/<id>', methods=['GET'])
-def get_product(id):
-  product = Product.query.get(id)
-  return product_schema.jsonify(product)
+# Get Single Users
+@app.route('/user/<id>', methods=['GET'])
+def get_user(id):
+  user = User.query.get(id)
+  return user_schema.jsonify(user)
 
-# Update a Product
-@app.route('/product/<id>', methods=['PUT'])
-def update_product(id):
-  product = Product.query.get(id)
+# Update a User
+@app.route('/user/<id>', methods=['PUT'])
+def update_user(id):
+  user = User.query.get(id)
 
   name = request.json['name']
-  description = request.json['description']
-  price = request.json['price']
-  qty = request.json['qty']
+  adress = request.json['adress']
+  # birthdate = request.json['birthdate']
 
-  product.name = name
-  product.description = description
-  product.price = price
-  product.qty = qty
+  user.name = name
+  user.adress = adress
+  # user.birthdate = birthdate
 
   db.session.commit()
 
-  return product_schema.jsonify(product)
+  return user_schema.jsonify(user)
 
-# Delete Product
-@app.route('/product/<id>', methods=['DELETE'])
-def delete_product(id):
-  product = Product.query.get(id)
-  db.session.delete(product)
+# Delete User
+@app.route('/user/<id>', methods=['DELETE'])
+def delete_user(id):
+  user = User.query.get(id)
+  db.session.delete(user)
   db.session.commit()
 
-  return product_schema.jsonify(product)
+  return user_schema.jsonify(user)
 
 # Run Server
 if __name__ == '__main__':
